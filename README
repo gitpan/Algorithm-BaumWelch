@@ -1,10 +1,10 @@
-Algorithm-BaumWelch version 0.0.1
+Algorithm-BaumWelch version 0.0.2
 
-The Baum–Welch algorithm is used to compute the parameters (transition and emission probabilities) of an HMM. The
+The Baum-Welch algorithm is used to compute the parameters (transition and emission probabilities) of an HMM. The
 algorithm calculates the forward and backwards probabilities for each HMM state and then re-estimates the parameters of
-the model. This module has been tested with a number of 2-hidden state cases but as yet has been subject to little
-testing with more than 2 hidden states.
-[ REPLACE THIS...
+the model. 
+
+This module has been tested with a number of 2-hidden state cases but as yet has been subject to almost no testing with >2 hidden states.
 
 INSTALLATION
 

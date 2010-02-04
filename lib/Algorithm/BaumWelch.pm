@@ -1,4 +1,3 @@
-# vale a pena em fazer forward/backward com normalisation? e gamma!?!
 package Algorithm::BaumWelch;
 use warnings;
 use strict;
@@ -7,14 +6,17 @@ use Math::Cephes qw/:explog/;
 use List::Util qw/sum/;
 use Text::SimpleTable;
 
+# vale a pena em fazer forward/backward com normalisation? e gamma!?!
+
 =head1 NAME
 
 Algorithm::BaumWelch - Baum-Welch Algorithm for Hidden Markov Chain parameter estimation.
 
+=cut
 
 =head1 VERSION
 
-This document describes Algorithm::BaumWelch version 0.0.1
+This document describes Algorithm::BaumWelch version 0.0.2
 
 =cut
 
@@ -22,28 +24,30 @@ This document describes Algorithm::BaumWelch version 0.0.1
 
     use Algorithm::BaumWelch;
 
-    # The observation series.
+    # The observation series see http://www.cs.jhu.edu/~jason/.
     my $obs_series = [qw/ obs2 obs3 obs3 obs2 obs3 obs2 obs3 obs2 obs2 
                           obs3 obs1 obs3 obs3 obs1 obs1 obs1 obs2 obs1 
                           obs1 obs1 obs3 obs1 obs2 obs1 obs1 obs1 obs2 
                           obs3 obs3 obs2 obs3 obs2 obs2
                      /];
 
-    # The emission matrix.
+    # The emission matrix - each nested array corresponds to the probabilities of a single observation type.
     my $emis = { 
-        obs1 =>  [0.7, 0.1], 
-        obs2 =>  [0.2, 0.2], 
-        obs3 =>  [0.1, 0.7], 
+        obs1 =>  [0.3, 0.3], 
+        obs2 =>  [0.3, 0.4], 
+        obs3 =>  [0.4, 0.3], 
                };
 
-    # The transition matrix.           
+    # The transition matrixi - each row and column correspond to a particular state e.g. P(state1_x|state1_x-1) = 0.9...
     my $trans = [ 
-                    [0.5, 0.5], 
-                    [0.5, 0.5], 
+                    [0.9, 0.1], 
+                    [0.1, 0.9], 
                 ];
 
+    # The probabilities of each state at the start of the series.
     my $start = [0.5, 0.5];
 
+    # Create an Algorithm::BaumWelch object.
     my $ba = Algorithm::BaumWelch->new;
 
     # Feed in the observation series.
@@ -52,29 +56,31 @@ This document describes Algorithm::BaumWelch version 0.0.1
     # Feed in the transition and emission matrices and the starting probabilities.
     $ba->feed_values($trans, $emis, $start);
 
-    # Alternatively you can randomly initialise the values - pass it the number of hidden states.
+    # Alternatively you can randomly initialise the values - pass it the number of hidden states - 
+    # i.e. to determine the parameters we need to make a first guess).
     # $ba->random_initialise(2);
      
     # Perform the algorithm.
     $ba->baum_welch;
 
-    # In VOID-context prints formated results to STDOUT. In LIST-context returns references to the predicted transition & emission matrices and the starting parameters.
+    # Use results to pass data. 
+    # In VOID-context prints formated results to STDOUT. 
+    # In LIST-context returns references to the predicted transition & emission matrices and the starting parameters.
     $ba->results;
 
 =cut
 
 =head1 DESCRIPTION
 
-The Baum–Welch algorithm is used to compute the parameters (transition and emission probabilities) of an HMM. The
-algorithm calculates the forward and backwards probabilities for each HMM state and then re-estimates the parameters of
-the model. This module has been tested with a number of 2-hidden state cases but as yet has been subject to little
-testing with more than 2 hidden states.
+The Baum-Welch algorithm is used to compute the parameters (transition and emission probabilities) of an Hidden Markov
+Model (HMM). The algorithm calculates the forward and backwards probabilities for each HMM state in a series and then re-estimates the parameters of
+the model. 
 
 =cut
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.0.2');
 
-#r/ matrices de BW sao 1xN_states matrices - quer dizer quasi arrays - entao nao usa matrices reais. arrays so bastante
+#r/ matrices de BW sao 1xN_states matrices - quer dizer quasi arrays - entao nao usa matrices reais. arrays são bastante
 sub new {
     my $class = shift;
     my $self = [undef, undef, []]; bless $self, $class;
@@ -93,7 +99,7 @@ sub feed_obs {
     return;
 }
 
-sub feed_others {
+sub feed_values {
     croak qq{\nThis method expects 3 arguments.} if @_ != 4;
     my ($self, $trans, $emis, $start) = @_;
     croak qq{\nThis method expects 3 arguments.} if (ref $trans ne q{ARRAY} || ref $emis ne q{HASH} || ref $start ne q{ARRAY});
@@ -313,7 +319,7 @@ sub _forwardbackward_reestimacao {
 }
 
 sub baum_welch {
-    #/ i´m being lazy this is an acceptable cut-off mechanism atm
+    #/ i´m being lazy this is an acceptable cut-off mechanism for now
     my ($self, $max) = @_;
     $max ||= 100;
     my $val;
@@ -328,7 +334,7 @@ sub baum_welch {
     return;
 }
 
-sub _baum_welch_test {
+sub _baum_welch_10 {
     my $self = shift;
     for (0..10) { $self->_forwardbackward_reestimacao; }
     return;
@@ -433,6 +439,12 @@ __END__
 #  |__ ARRAY REFERENCE (1)  [ '->[2]' ] # perp
 #
 
+=head1 SEE ALSO
+
+Algorithm::Viterbi
+
+=cut
+
 =head1 DEPENDENCIES
 
 'Carp'                      => '1.08', 
@@ -442,7 +454,16 @@ __END__
 
 =cut
 
+=head1 WARNING
+
+This module Baum-Welch implementation has been tested fairly extensively with 2-hidden state cases but as yet has been subject to little (almost
+no) testing with >2 hidden states.
+
+=cut
+
 =head1 BUGS AND LIMITATIONS
+
+Let me know.
 
 =head1 AUTHOR
 

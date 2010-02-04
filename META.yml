@@ -1,6 +1,6 @@
 ---
 name: Algorithm-BaumWelch
-version: v0.0.1
+version: v0.0.2
 author:
   - 'Daniel S. T. Hughes <dsth@cantab.net>'
 abstract: Baum-Welch Algorithm for Hidden Markov Chain parameter estimation.
@@ -19,7 +19,7 @@ configure_requires:
 provides:
   Algorithm::BaumWelch:
     file: lib/Algorithm/BaumWelch.pm
-    version: v0.0.1
+    version: v0.0.2
 generated_by: Module::Build version 0.340201
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
